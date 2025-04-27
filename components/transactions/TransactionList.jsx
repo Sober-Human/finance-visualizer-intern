@@ -7,7 +7,7 @@ import {
   TableRow, TableCell, TableCaption 
 } from '../ui/table';
 import { formatCurrency, formatDateForDisplay } from '../../lib/utils';
-import { Edit, Trash2, ArrowUpDown, Info } from 'lucide-react';
+import { Edit, Trash2, ArrowUpDown, Info, Tag } from 'lucide-react';
 
 export default function TransactionList({ onEditTransaction }) {
   const { transactions, deleteTransaction } = useTransactions();
@@ -89,49 +89,52 @@ export default function TransactionList({ onEditTransaction }) {
               <TableCaption>List of all your financial transactions</TableCaption>
               <TableHeader>
                 <TableRow>
-                  <TableHead 
-                    className="w-[120px] cursor-pointer"
-                    onClick={() => requestSort('date')}
-                  >
+                  <TableHead onClick={() => requestSort('amount')} className="cursor-pointer w-[15%]">
+                    <div className="flex items-center space-x-1">
+                      <span>Amount</span>
+                      <ArrowUpDown size={16} className="ml-1" />
+                    </div>
+                  </TableHead>
+                  <TableHead onClick={() => requestSort('date')} className="cursor-pointer w-[20%]">
                     <div className="flex items-center space-x-1">
                       <span>Date</span>
-                      <ArrowUpDown className="h-3 w-3" />
+                      <ArrowUpDown size={16} className="ml-1" />
                     </div>
                   </TableHead>
-                  <TableHead 
-                    className="cursor-pointer"
-                    onClick={() => requestSort('description')}
-                  >
+                  <TableHead onClick={() => requestSort('category')} className="cursor-pointer w-[15%]">
+                    <div className="flex items-center space-x-1">
+                      <span>Category</span>
+                      <ArrowUpDown size={16} className="ml-1" />
+                    </div>
+                  </TableHead>
+                  <TableHead onClick={() => requestSort('description')} className="cursor-pointer w-[35%]">
                     <div className="flex items-center space-x-1">
                       <span>Description</span>
-                      <ArrowUpDown className="h-3 w-3" />
+                      <ArrowUpDown size={16} className="ml-1" />
                     </div>
                   </TableHead>
-                  <TableHead 
-                    className="cursor-pointer text-right"
-                    onClick={() => requestSort('amount')}
-                  >
-                    <div className="flex items-center justify-end space-x-1">
-                      <span>Amount</span>
-                      <ArrowUpDown className="h-3 w-3" />
-                    </div>
-                  </TableHead>
-                  <TableHead className="w-[110px] text-right">Actions</TableHead>
+                  <TableHead className="text-right w-[15%]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {getSortedTransactions().map((transaction) => (
                   <TableRow key={transaction.id}>
-                    <TableCell className="font-medium">
-                      {formatDateForDisplay(transaction.date)}
-                    </TableCell>
-                    <TableCell>{transaction.description}</TableCell>
-                    <TableCell 
-                      className={`text-right font-medium ${transaction.amount < 0 ? 'text-red-600' : 'text-green-600'}`}
-                    >
+                    <TableCell className={transaction.amount < 0 ? 'text-destructive font-medium' : 'text-emerald-600 font-medium'}>
                       {formatCurrency(transaction.amount)}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell>
+                      {formatDateForDisplay(transaction.date)}
+                    </TableCell>
+                    <TableCell>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                        <Tag className="mr-1 h-3 w-3" />
+                        {transaction.category || 'Other'}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      {transaction.description}
+                    </TableCell>
+                    <TableCell className="text-right space-x-1">
                       {deleteConfirm === transaction.id ? (
                         <div className="flex justify-end space-x-1">
                           <Button 

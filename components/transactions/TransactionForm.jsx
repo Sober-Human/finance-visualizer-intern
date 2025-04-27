@@ -4,15 +4,17 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../ui/card';
 import { Alert, AlertDescription } from '../ui/alert';
-import { formatDateForInput, validateTransaction } from '../../lib/utils';
+import { formatDateForInput, validateTransaction, TRANSACTION_CATEGORIES } from '../../lib/utils';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select';
 
 export default function TransactionForm({ onSubmit, initialData = null, onCancel }) {
   // Initialize form state
   const [formData, setFormData] = useState({
     amount: '',
     date: formatDateForInput(new Date()),
-    description: ''
+    description: '',
+    category: ''
   });
   
   // State for errors and submission feedback
@@ -26,7 +28,8 @@ export default function TransactionForm({ onSubmit, initialData = null, onCancel
       setFormData({
         amount: initialData.amount.toString(),
         date: formatDateForInput(new Date(initialData.date)),
-        description: initialData.description
+        description: initialData.description,
+        category: initialData.category || ''
       });
       // Clear any previous feedback/errors when editing
       setFeedback(null);
@@ -87,7 +90,8 @@ export default function TransactionForm({ onSubmit, initialData = null, onCancel
         setFormData({
           amount: '',
           date: formatDateForInput(new Date()),
-          description: ''
+          description: '',
+          category: ''
         });
       }
     } catch (error) {
@@ -187,6 +191,50 @@ export default function TransactionForm({ onSubmit, initialData = null, onCancel
             />
             {errors.description && (
               <p className="text-xs font-medium text-destructive mt-1">{errors.description}</p>
+            )}
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="category" className="text-sm font-medium">
+              Category
+            </Label>
+            <Select 
+              value={formData.category} 
+              onValueChange={(value) => {
+                setFormData(prev => ({
+                  ...prev,
+                  category: value
+                }));
+                // Clear error when value is selected
+                if (errors.category) {
+                  setErrors(prev => ({
+                    ...prev,
+                    category: null
+                  }));
+                }
+                // Clear feedback message
+                if (feedback) {
+                  setFeedback(null);
+                }
+              }}
+              disabled={isSubmitting}
+            >
+              <SelectTrigger 
+                id="category"
+                className={errors.category ? 'border-destructive focus-visible:ring-destructive' : ''}
+              >
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                {TRANSACTION_CATEGORIES.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.category && (
+              <p className="text-xs font-medium text-destructive mt-1">{errors.category}</p>
             )}
           </div>
         </form>
